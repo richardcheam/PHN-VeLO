@@ -1,4 +1,4 @@
-# Pareto HyperNetworks for dSprites
+# Pareto HyperNetworks with VeLO and LibMOON for dSprites
 
 ## Before running
 
