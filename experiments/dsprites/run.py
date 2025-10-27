@@ -1,3 +1,7 @@
+import sys
+sys.path
+sys.path.append("../../")
+
 from experiments.dsprites.data import Dataset
 from experiments.dsprites.models import (
     LeNetHyper,

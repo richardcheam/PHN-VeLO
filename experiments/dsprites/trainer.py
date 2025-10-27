@@ -1,9 +1,10 @@
 import sys
 sys.path
+sys.path.append("../../")
 sys.path.append("/Users/macbookpro/Desktop/M2DS/stageMOO/libmoon-enhanced/libmoon")
-from libmoon.solver.gradient.methods import EPOSolver, MGDAUBSolver, RandomSolver, PMGDASolver, MOOSVGDSolver, PMTLSolver, GradHVSolver, GradAggSolver, PCGradSolver, NashMTLSolver
-from libmoon.solver.gradient.methods.core.core_mtl import GradBaseMTLSolver
-from libmoon.solver.gradient.methods.epo_solver import EPOCore
+# from libmoon.solver.gradient.methods import EPOSolver, MGDAUBSolver, RandomSolver, PMGDASolver, MOOSVGDSolver, PMTLSolver, GradHVSolver, GradAggSolver, PCGradSolver, NashMTLSolver
+# from libmoon.solver.gradient.methods.core.core_mtl import GradBaseMTLSolver
+# from libmoon.solver.gradient.methods.epo_solver import EPOCore
 
 import logging
 import argparse
@@ -32,8 +33,10 @@ from experiments.utils import (
     set_logger,
     set_seed,
 )
-# from phn import EPOSolver
+from phn import EPOSolver
 from phn import LinearScalarizationSolver
+# LibMOON Solver
+from phn.libmoon_wrapper import *
 
 # the sizes of the first and second convolution layers' kernels
 # here we use 9 and 5
@@ -121,6 +124,7 @@ def train(
     net: nn.Module = LeNetTarget(KERNEL_SIZE, out_dim=out_dim, n_tasks=n_tasks, img_size=img_size)
 
     logging.info(f"HN size: {count_parameters(hnet)}")
+    print(f"TargetNet size: {count_parameters(net)}")
 
     hnet = hnet.to(device)
     net = net.to(device)
@@ -133,23 +137,22 @@ def train(
 
     # optimizer = torch.optim.Adam(hnet.parameters(), lr=lr, weight_decay=wd)
     from pylo.optim import VeLO
-    optimizer = VeLO(hnet.parameters(), lr=1.0)
+    NUM_STEPS=int(597196/bs * epochs)
+    print(f"number of train steps: {NUM_STEPS}")
+    optimizer = VeLO(hnet.parameters(), lr=1.0, num_steps=NUM_STEPS)
 
     # ------
     # selecting the solver method
     # ------
-    # solvers = dict(ls=LinearScalarizationSolver, epo=EPOSolver)
-    solvers = dict(ls=LinearScalarizationSolver, epo=GradBaseMTLSolver)
+    solvers = dict(ls=LinearScalarizationSolver, epo=EPOSolver)
+    comb = make_combiner(solver_type)
 
     solver_method = solvers[solver_type]
     if solver_type == "epo":
         pref = torch.from_numpy(
                 np.random.dirichlet([alpha] * n_tasks, 1).astype(np.float32).flatten()
             )
-        # solver = solver_method(n_tasks=n_tasks, n_params=count_parameters(hnet))
-        core_solver = EPOCore(n_var=count_parameters(hnet), prefs=pref)
-        solver = GradBaseMTLSolver(problem_name=problem_name, step_size=1e-4, epoch=epochs, core_solver=core_solver,
-                                        batch_size=bs, prefs=pref)
+        solver = solver_method(n_tasks=n_tasks, n_params=count_parameters(hnet))
     else:
         # ls
         solver = solver_method(n_tasks=n_tasks)
@@ -207,6 +210,7 @@ def train(
             # the use these weights to make a prediction
             # on the current batch by giving the weights
             # to net (the target network)
+            ### forward: hypernet -> weights -> target logits
             weights = hnet(ray)
             logits = net(img, weights)
             
@@ -224,6 +228,9 @@ def train(
             # use the selected solver to optimize the hnet parameters
             loss_sol = solver(losses, ray, list(hnet.parameters()))
             loss_sol.backward() # compute gradient wrt to hnet params
+
+            #loss_sol = comb(losses=losses, ray = pref, params=list(hnet.parameters()))
+            #loss_sol.backward()
 
             desc = f'total weighted loss: {loss_sol.item():.3f}'
             for i in range(n_tasks):
@@ -315,7 +322,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--datapath",
         type=str,
-        default="data/pareto-hypernetworks-master/experiments/dsprites/data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz",
+        #default="data/pareto-hypernetworks-master/experiments/dsprites/data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz",
+        default="data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz",
         help="path to data",
     )
     parser.add_argument("--n-epochs", type=int, default=50, help="num. epochs")

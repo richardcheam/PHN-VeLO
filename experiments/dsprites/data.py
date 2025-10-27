@@ -50,7 +50,10 @@ class Dataset:
             valX = torch.from_numpy(valX.reshape(n_val, 1, 64, 64)).float()
             valLabel = torch.from_numpy(valLabel).long()
             val_set = torch.utils.data.TensorDataset(valX, valLabel)
-
+            print(f"train_size: {n_train}")
+            print(f"val_size: {n_val}")
+            print(f"test_size: {n_test}")
             return train_set, val_set, test_set
-
+        print(f"train_size: {n_train}")
+        print(f"test_size: {n_test}")
         return train_set, test_set
