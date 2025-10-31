@@ -1,4 +1,4 @@
-# Pareto HyperNetworks with VeLO and LibMOON for dSprites
+# Pareto HyperNetworks with VeLO LibMOON for dSprites, extension to LibMOON solvers
 
 ## Before running
 
