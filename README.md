@@ -27,7 +27,7 @@ Else, run this command to get all the possible arguments:
 experiments/dsprites $> python trainer.py --help
 ```
 
-use script `trainer_adam.py` to train with Adam and `trainer_libmoon.py` to train with LibMOON solver for gradient combinations. **Note that** only EPO LibMOON solver is available which provides as an example. More solvers can be added in `PHN-VeLO/phn/libmoon_wrapper.py`.
+use script `trainer_adam.py` to train with Adam and `trainer_libmoon.py` to train with LibMOON solver for gradient combinations. **Note that** only EPO LibMOON solver is available which provides as an example. More solvers can be added in `/phn/libmoon_wrapper.py`.
 
 ## Visualize Pareto front
 
