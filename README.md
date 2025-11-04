@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 > ⚠️ **Warning:** there could be dependencies issue with different libraries and utility functions at first, but it is fast to solve!  
 
-## Train the model
+## Train the model with VeLO
 
 Run the following command in experiments/dsprites to train the model with the default options:
 
@@ -26,6 +26,8 @@ Else, run this command to get all the possible arguments:
 ```bash
 experiments/dsprites $> python trainer.py --help
 ```
+
+use script `trainer_adam.py` to train with Adam and `trainer_libmoon.py` to train with LibMOON solver for gradient combinations. **Note that** only EPO LibMOON solver is available which provides as an example. More solvers can be added in `PHN-VeLO/phn/libmoon_wrapper.py`.
 
 ## Visualize Pareto front
 
