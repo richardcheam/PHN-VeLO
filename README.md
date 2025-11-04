@@ -1,12 +1,17 @@
 # Pareto HyperNetworks with VeLO LibMOON for dSprites, extension to LibMOON solvers
 
-## Before running
+## How to run locally?
 
-Run the following command before doing anything, to install all the requirements:
-
+Make sure to have virtual environment. If not, in terminal do ```pip3 install virtualenv```. Then,
 ```bash
-$> pip install -e .
+git clone https://github.com/richardcheam/PHN-VeLO.git
+cd PHN-VeLO
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
 ```
+
+> ⚠️ **Warning:** there could be dependencies issue with different libraries and utility functions at first, but it is fast to solve!  
 
 ## Train the model
 
